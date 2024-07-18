@@ -85,7 +85,7 @@ COLOR_ACTIVE = pygame.Color('dodgerblue2')
 FONT = pygame.font.Font(None, 32)
 
 
-class InputBox:
+class SummonerIDInputBox:
 
     def __init__(self, x, y, w, h, text=''):
         self.rect = pygame.Rect(x, y, w, h)
@@ -107,8 +107,7 @@ class InputBox:
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
-                    print(self.text)
-                    self.text = ''
+                    choose_analysis_screen(self.text)
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
@@ -128,10 +127,10 @@ class InputBox:
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
 def enter_riot_id(): #add game start screen
-    enter_riot_id = True
-    input_box1 = InputBox(screen_width/2-100, screen_height/2, 140, 32)
+    done = False
+    input_riot_id = SummonerIDInputBox(screen_width/2-100, screen_height/2, 140, 32)
 
-    input_boxes = [input_box1]
+    input_boxes = [input_riot_id]
     while enter_riot_id: #start screen loop
         for event in pygame.event.get():
                 if event.type == pygame.QUIT: #if clock exit, quit game
