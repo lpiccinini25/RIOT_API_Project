@@ -55,48 +55,6 @@ bright_green = (0,255,0)
 screen_width = 500
 screen_height = 500
 
-
-def game_start_screen(): #add game start screen
-    game_start = True
-    input_box1 = InputBox(screen_width/2-100, screen_height/2, 140, 32)
-
-    input_boxes = [input_box1]
-    while game_start: #start screen loop
-        for event in pygame.event.get():
-                if event.type == pygame.QUIT: #if clock exit, quit game
-                    pygame.quit()
-                    quit()
-                for box in input_boxes:
-                    box.handle_event(event)
-        window.fill(black)
-        #^ fill in screen black
-
-        for box in input_boxes:
-            box.update()
-            box.draw(screen)
-        
-        #^add image of a chicken
-
-
-        clock = pygame.time.Clock()
-        #^ clock for death screen
-
-        largeText = pygame.font.SysFont("ariel",25)
-        #^ create font to render in text
-
-        #^^ create text boxes for Final Score and Final level for death screen
-        TextSurf, TextRect = text_objects("Please Enter Your Riot name and Riot Id", largeText)
-
-        #^^ create text boxes for welcoming text
-        TextRect.center = ((screen_width/2),(screen_height/5.5))
-        #^^ set the location of the text boxes
-        window.blit(TextSurf, TextRect)
-        #^ render text onto the window
-
-        #quit and restart buttons^
-        pygame.display.update()
-        clock.tick(15)
-
 def text_objects(text, font): #create text objects
     textSurface = font.render(text, True, white)
     return textSurface, textSurface.get_rect()
@@ -169,10 +127,51 @@ class InputBox:
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
+def enter_riot_id(): #add game start screen
+    enter_riot_id = True
+    input_box1 = InputBox(screen_width/2-100, screen_height/2, 140, 32)
+
+    input_boxes = [input_box1]
+    while enter_riot_id: #start screen loop
+        for event in pygame.event.get():
+                if event.type == pygame.QUIT: #if clock exit, quit game
+                    pygame.quit()
+                    quit()
+                for box in input_boxes:
+                    box.handle_event(event)
+        window.fill(black)
+        #^ fill in screen black
+
+        for box in input_boxes:
+            box.update()
+            box.draw(screen)
+        
+        #^add image of a chicken
+
+
+        clock = pygame.time.Clock()
+        #^ clock for death screen
+
+        largeText = pygame.font.SysFont("ariel",25)
+        #^ create font to render in text
+
+        #^^ create text boxes for Final Score and Final level for death screen
+        TextSurf, TextRect = text_objects("Please Enter Your Riot name and Riot Id", largeText)
+
+        #^^ create text boxes for welcoming text
+        TextRect.center = ((screen_width/2),(screen_height/5.5))
+        #^^ set the location of the text boxes
+        window.blit(TextSurf, TextRect)
+        #^ render text onto the window
+
+        #quit and restart buttons^
+        pygame.display.update()
+        clock.tick(15)
+
 
 pygame.init()
 window = pygame.display.set_mode((500, 500))
-game_start_screen()
+enter_riot_id()
 
 
 
