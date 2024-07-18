@@ -1,7 +1,7 @@
 
 import requests
 import pygame
-import Functions
+import functions
 
 
 black = (0,0,0)
@@ -29,7 +29,7 @@ def button(self,msg,x,y,w,h,ic,ac,action=None): #add button function
         textRect.center = ( (x+(w/2)), (y+(h/2)) )
         self.window.blit(textSurf, textRect)
 
-api_key = 'RGAPI-f2234498-0b43-4612-a09c-afa88c8e7f86'
+api_key = 'RGAPI-267c12a7-85cd-4d85-9f5e-ea9d4d1645a3'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
 
 print(requests.get(api_url))
@@ -37,9 +37,7 @@ print(requests.get(api_url))
 
 api_url = api_url + '?api_key=' + api_key
 
-resp = requests.get(api_url)
-account_info = resp.json()
-puuid = account_info['puuid']
+puuid = functions.get_puuid('llimeincoconut', '0000')
 
 
 match_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/' + puuid + '/ids?start=0&count=20' + '&api_key=' + api_key
