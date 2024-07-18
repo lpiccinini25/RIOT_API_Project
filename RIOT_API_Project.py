@@ -10,10 +10,6 @@ white = (255,255,255)
 api_key = 'RGAPI-267c12a7-85cd-4d85-9f5e-ea9d4d1645a3'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
 
-print(requests.get(api_url))
-
-
-api_url = api_url + '?api_key=' + api_key
 
 puuid = functions.get_puuid('llimeincoconut', '0000', api_key)
 
