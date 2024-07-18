@@ -1,6 +1,7 @@
 
 import requests
 import pygame
+import Functions
 
 
 black = (0,0,0)
@@ -32,6 +33,7 @@ api_key = 'RGAPI-f2234498-0b43-4612-a09c-afa88c8e7f86'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
 
 print(requests.get(api_url))
+
 
 api_url = api_url + '?api_key=' + api_key
 
@@ -79,5 +81,4 @@ def compare_cs(match_history, api_key):
     return average_difference
 
         
-print(compare_cs(match_history, api_key))
 
