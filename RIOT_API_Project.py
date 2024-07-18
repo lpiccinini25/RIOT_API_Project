@@ -1,5 +1,6 @@
 
 import requests
+import pygame
 
 api_key = 'RGAPI-f2234498-0b43-4612-a09c-afa88c8e7f86'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
@@ -53,6 +54,4 @@ def compare_cs(match_history, api_key):
 
         
 print(compare_cs(match_history, api_key))
-
-
 
