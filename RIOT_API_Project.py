@@ -20,14 +20,6 @@ resp = requests.get(match_url)
 match_history = resp.json()
 
 
-"""
-for match in match_history:
-    api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key
-    resp = requests.get(api_url)
-    stats = resp.json()
-    player_index = stats['metadata']['participants'].index(puuid)
-    lane = stats['info']['participants'][player_index]['challenges']['lane']
-"""
 def compare_cs(match_history, api_key):
 
     total_difference = 0
