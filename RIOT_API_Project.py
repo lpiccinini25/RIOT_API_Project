@@ -11,15 +11,7 @@ api_key = 'RGAPI-267c12a7-85cd-4d85-9f5e-ea9d4d1645a3'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
 
 
-puuid = functions.get_puuid('llimeincoconut', '0000', api_key)
-
-
-match_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/' + puuid + '/ids?start=0&count=20' + '&api_key=' + api_key
-print(puuid)
-resp = requests.get(match_url)
-match_history = resp.json()
-
-
+"""
 def compare_cs(match_history, api_key):
 
     total_difference = 0
@@ -43,7 +35,7 @@ def compare_cs(match_history, api_key):
     
     average_difference = total_difference / len(match_history)
     return average_difference
-
+"""
 black = (0,0,0)
 white = (255,255,255)
 
@@ -107,13 +99,15 @@ class SummonerIDInputBox:
         if event.type == pygame.KEYDOWN:
             if self.active:
                 if event.key == pygame.K_RETURN:
-                    choose_analysis_screen(self.text)
+                    return True, self.text
                 elif event.key == pygame.K_BACKSPACE:
                     self.text = self.text[:-1]
                 else:
                     self.text += event.unicode
                 # Re-render the text.
                 self.txt_surface = FONT.render(self.text, True, self.color)
+        
+        return False, self.text
 
     def update(self):
         # Resize the box if the text is too long.
@@ -131,13 +125,13 @@ def enter_riot_id(): #add game start screen
     input_riot_id = SummonerIDInputBox(screen_width/2-100, screen_height/2, 140, 32)
 
     input_boxes = [input_riot_id]
-    while enter_riot_id: #start screen loop
+    while not done: #start open screen loop
         for event in pygame.event.get():
                 if event.type == pygame.QUIT: #if clock exit, quit game
                     pygame.quit()
                     quit()
                 for box in input_boxes:
-                    box.handle_event(event)
+                    done, text = box.handle_event(event)
         window.fill(black)
         #^ fill in screen black
 
@@ -166,6 +160,32 @@ def enter_riot_id(): #add game start screen
         #quit and restart buttons^
         pygame.display.update()
         clock.tick(15)
+    choose_analysis_screen(text)
+
+def choose_analysis_screen(riot_id_and_name):
+    riot_id_and_name = riot_id_and_name.split("#")
+    riot_name = riot_id_and_name[0]
+    riot_id = riot_id_and_name[1]
+    functions.get_puuid(riot_name, riot_id, api_key)
+    done = False
+
+    while not done:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT: #if clock exit, quit game
+                pygame.quit()
+                quit()
+        window.fill(black)
+        button('average kda',screen_width/2,screen_height/2,100,100,green,bright_green, )
+        pygame.display.update()
+
+
+
+
+        clock = pygame.time.Clock()
+        clock.tick(15)
+    
+
+
 
 
 pygame.init()
