@@ -1,6 +1,9 @@
 
 import requests
 import pygame
+import asyncio
+import aiohttp
+
 pygame.init()
 
 black = (0,0,0)
@@ -162,40 +165,48 @@ def choose_analysis_screen(riot_id_and_name):
             if event.type == pygame.QUIT: #if clock exit, quit game
                 pygame.quit()
                 quit()
-        button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, lambda: display_average_kda(puuid, match_history, api_key))
+        button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, lambda: display_average_kda(puuid, match_history))
 
         largeText = pygame.font.SysFont("Georgia",25)
 
-        TextSurf, TextRect = text_objects('Data taken from the last ' + str(len(match_history)) + ' games', largeText)
+        TextSurf, TextRect = text_objects('Data taken from last ' + str(len(match_history)) + ' games', largeText)
         TextRect.center = ((screen_width/2),(screen_height/6))
         window.blit(TextSurf, TextRect)
 
-
         pygame.display.update()
-
-
 
         clock = pygame.time.Clock()
         clock.tick(15)
     
 
 
-def display_average_kda(puuid, match_history, api_key):
-    average_kda = get_average_kda(puuid, match_history, api_key)
+def display_average_kda(puuid, match_history):
+    average_kda = asyncio.run(get_average_kda(puuid, match_history))
     statText = pygame.font.SysFont("Georgia",20)
     textSurf, textRect = text_objects(str(average_kda), statText)
     window.blit(textSurf, textRect)
 
-def get_average_kda(puuid, match_history, api_key):
-    sum = 0 
+def get_tasks(session, match_history):
+    tasks = []
     for match in match_history:
-        api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key
-        resp = requests.get(api_url)
-        match_broad = resp.json()
-        player_index = match_broad['metadata']['participants'].index(puuid)
-        playerGameStats = match_broad['info']['participants'][player_index]['challenges']
-        sum += playerGameStats['kda']
-    return sum / len(match_history)
+        tasks.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
+    return tasks
+
+
+async def get_average_kda(puuid, match_history):
+    async with aiohttp.ClientSession() as session:
+        sum = 0 
+        tasks = get_tasks(session, match_history)
+        responses = await asyncio.gather(*tasks)
+        for response in responses:
+            match_broad = await response.json()
+            player_index = match_broad['metadata']['participants'].index(puuid)
+            playerGameStats = match_broad['info']['participants'][player_index]['challenges']
+            sum += playerGameStats['kda']
+        return sum / len(match_history)
+
+
+
 
 def get_puuid(name, riot_id, api_key):
     puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
