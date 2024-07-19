@@ -154,8 +154,8 @@ def choose_analysis_screen(riot_id_and_name):
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
-    puuid = functions.get_puuid(riot_name, riot_id, api_key)
-    match_history = functions.get_match_history(puuid, api_key)
+    puuid = get_puuid(riot_name, riot_id, api_key)
+    match_history = get_match_history(puuid, api_key)
     done = False
 
     while not done:
@@ -206,7 +206,7 @@ def get_match_history(puuid, api_key):
 
 
 
-pygame.init()
+
 window = pygame.display.set_mode((500, 500))
 enter_riot_id()
 
