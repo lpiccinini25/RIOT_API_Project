@@ -1,8 +1,7 @@
 
 import requests
 import pygame
-import functions
-
+pygame.init()
 
 black = (0,0,0)
 white = (255,255,255)
@@ -60,7 +59,6 @@ def button(msg,x,y,w,h,ic,ac,action=None): #add button function
         pygame.draw.rect(window, ac,(x,y,w,h))
         if click[0] == 1 and action != None:
             # runs whatever function is input, could be self.run() or quitgame()
-            print(action)
             action()
     else: # if no action, meaning button not clicked, then render buttons
         pygame.draw.rect(window, ic,(x,y,w,h))
@@ -135,7 +133,7 @@ def enter_riot_id():
         for box in input_boxes:
             box.update()
             box.draw(screen)
-        clock = pygame.time.Clock()
+        
 
         largeText = pygame.font.SysFont("ariel",25)
 
@@ -146,6 +144,7 @@ def enter_riot_id():
         window.blit(TextSurf, TextRect)
  
         pygame.display.update()
+        clock = pygame.time.Clock()
         clock.tick(15)
     choose_analysis_screen(text)
 
