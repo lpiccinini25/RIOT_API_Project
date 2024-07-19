@@ -22,8 +22,8 @@ def get_average_kda(puuid, match_history, api_key):
         api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key
         resp = requests.get(api_url)
         match_broad = resp.json()
-        player_index = match_broad['info']['participants'].index(puuid)
-        playerGameStats = match_broad['challenges']['participants'][player_index]
+        player_index = match_broad['metadata']['participants'].index(puuid)
+        playerGameStats = match_broad['info']['participants']['challenges'][player_index]
         sum += playerGameStats['kda']
     return sum / len(match_history)
         
