@@ -164,6 +164,12 @@ def choose_analysis_screen(riot_id_and_name):
                 quit()
         button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, lambda: display_average_kda(puuid, match_history, api_key))
 
+        largeText = pygame.font.SysFont("Georgia",25)
+
+        TextSurf, TextRect = text_objects('Data taken from the last ' + str(len(match_history)) + ' games', largeText)
+        TextRect.center = ((screen_width/2),(screen_height/6))
+        window.blit(TextSurf, TextRect)
+
 
         pygame.display.update()
 
