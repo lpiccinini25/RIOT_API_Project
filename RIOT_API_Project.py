@@ -119,7 +119,7 @@ class SummonerIDInputBox:
 
 def enter_riot_id():
     done = False
-    input_riot_id = SummonerIDInputBox(screen_width/2-100, screen_height/2, 140, 32)
+    input_riot_id = SummonerIDInputBox(screen_width/1.3, screen_height/2, 300, 25)
     input_boxes = [input_riot_id]
     while not done: 
         for event in pygame.event.get():
@@ -139,7 +139,7 @@ def enter_riot_id():
 
         TextSurf, TextRect = text_objects("Please Enter Your Riot name and Riot Id", largeText)
  
-        TextRect.center = ((screen_width/2),(screen_height/5.5))
+        TextRect.center = ((screen_width/1.035),(screen_height/3))
 
         window.blit(TextSurf, TextRect)
  
@@ -213,7 +213,7 @@ def get_match_history(puuid, api_key):
 
 
 
-window = pygame.display.set_mode((500, 500))
+window = pygame.display.set_mode((1000,550))
 enter_riot_id()
 
 
