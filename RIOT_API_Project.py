@@ -175,7 +175,7 @@ def choose_analysis_screen(riot_id_and_name):
 
 
 def display_average_kda(puuid, match_history, api_key):
-    average_kda = functions.get_average_kda(puuid, match_history, api_key)
+    average_kda = get_average_kda(puuid, match_history, api_key)
     statText = pygame.font.SysFont("Georgia",20)
     textSurf, textRect = text_objects(str(average_kda), statText)
     window.blit(textSurf, textRect)
@@ -190,6 +190,19 @@ def get_average_kda(puuid, match_history, api_key):
         playerGameStats = match_broad['info']['participants'][player_index]['challenges']
         sum += playerGameStats['kda']
     return sum / len(match_history)
+
+def get_puuid(name, riot_id, api_key):
+    puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
+    resp = requests.get(puuid_url)
+    account_info = resp.json()
+    puuid = account_info["puuid"]
+    return puuid
+
+def get_match_history(puuid, api_key):
+    api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/' + puuid + '/ids?start=0&count=20&api_key='+ api_key
+    resp = requests.get(api_url)
+    match_history = resp.json()
+    return match_history 
 
 
 
