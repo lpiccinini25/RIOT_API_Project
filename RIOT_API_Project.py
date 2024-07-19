@@ -180,6 +180,17 @@ def display_average_kda(puuid, match_history, api_key):
     textSurf, textRect = text_objects(str(average_kda), statText)
     window.blit(textSurf, textRect)
 
+def get_average_kda(puuid, match_history, api_key):
+    sum = 0 
+    for match in match_history:
+        api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key
+        resp = requests.get(api_url)
+        match_broad = resp.json()
+        player_index = match_broad['metadata']['participants'].index(puuid)
+        playerGameStats = match_broad['info']['participants'][player_index]['challenges']
+        sum += playerGameStats['kda']
+    return sum / len(match_history)
+
 
 
 pygame.init()
