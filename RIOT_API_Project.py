@@ -6,7 +6,7 @@ pygame.init()
 black = (0,0,0)
 white = (255,255,255)
 
-api_key = 'RGAPI-267c12a7-85cd-4d85-9f5e-ea9d4d1645a3'
+api_key = 'RGAPI-a076eb99-f790-4996-aeda-96f804bafddd'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
 
 
