@@ -155,14 +155,16 @@ def choose_analysis_screen(riot_id_and_name):
     puuid = get_puuid(riot_name, riot_id, api_key)
     match_history = get_match_history(puuid, api_key)
     done = False
+    window.fill(black)
 
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #if clock exit, quit game
                 pygame.quit()
                 quit()
-        window.fill(black)
-        button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, display_average_kda(puuid, match_history, api_key))
+        button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, lambda: display_average_kda(puuid, match_history, api_key))
+
+
         pygame.display.update()
 
 
