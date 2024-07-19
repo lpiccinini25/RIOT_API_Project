@@ -120,44 +120,32 @@ class SummonerIDInputBox:
         # Blit the rect.
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
-def enter_riot_id(): #add game start screen
+def enter_riot_id():
     done = False
     input_riot_id = SummonerIDInputBox(screen_width/2-100, screen_height/2, 140, 32)
-
     input_boxes = [input_riot_id]
-    while not done: #start open screen loop
+    while not done: 
         for event in pygame.event.get():
-                if event.type == pygame.QUIT: #if clock exit, quit game
+                if event.type == pygame.QUIT: 
                     pygame.quit()
                     quit()
                 for box in input_boxes:
                     done, text = box.handle_event(event)
         window.fill(black)
-        #^ fill in screen black
 
         for box in input_boxes:
             box.update()
             box.draw(screen)
-        
-        #^add image of a chicken
-
-
         clock = pygame.time.Clock()
-        #^ clock for death screen
 
         largeText = pygame.font.SysFont("ariel",25)
-        #^ create font to render in text
 
-        #^^ create text boxes for Final Score and Final level for death screen
         TextSurf, TextRect = text_objects("Please Enter Your Riot name and Riot Id", largeText)
-
-        #^^ create text boxes for welcoming text
+ 
         TextRect.center = ((screen_width/2),(screen_height/5.5))
-        #^^ set the location of the text boxes
-        window.blit(TextSurf, TextRect)
-        #^ render text onto the window
 
-        #quit and restart buttons^
+        window.blit(TextSurf, TextRect)
+ 
         pygame.display.update()
         clock.tick(15)
     choose_analysis_screen(text)
@@ -166,7 +154,8 @@ def choose_analysis_screen(riot_id_and_name):
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
-    functions.get_puuid(riot_name, riot_id, api_key)
+    puuid = functions.get_puuid(riot_name, riot_id, api_key)
+    match_history = functions.get_match_history(puuid, api_key)
     done = False
 
     while not done:
@@ -175,9 +164,8 @@ def choose_analysis_screen(riot_id_and_name):
                 pygame.quit()
                 quit()
         window.fill(black)
-        button('average kda',screen_width/2,screen_height/2,100,100,green,bright_green, )
+        button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, display_average_kda(puuid, match_history, api_key))
         pygame.display.update()
-
 
 
 
@@ -185,6 +173,12 @@ def choose_analysis_screen(riot_id_and_name):
         clock.tick(15)
     
 
+
+def display_average_kda(puuid, match_history, api_key):
+    average_kda = functions.get_average_kda(puuid, match_history, api_key)
+    statText = pygame.font.SysFont("Georgia",20)
+    textSurf, textRect = text_objects(str(average_kda), statText)
+    window.blit(textSurf, textRect)
 
 
 
