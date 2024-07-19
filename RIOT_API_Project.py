@@ -70,7 +70,6 @@ def button(msg,x,y,w,h,ic,ac,action=None): #add button function
         window.blit(textSurf, textRect)
 
 
-pygame.init()
 screen = pygame.display.set_mode((640, 480))
 COLOR_INACTIVE = pygame.Color('lightskyblue3')
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
