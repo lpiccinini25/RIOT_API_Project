@@ -12,8 +12,6 @@ white = (255,255,255)
 api_key = 'RGAPI-a076eb99-f790-4996-aeda-96f804bafddd'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
 
-
-
 """
 def compare_cs(match_history, api_key):
 
@@ -39,6 +37,7 @@ def compare_cs(match_history, api_key):
     average_difference = total_difference / len(match_history)
     return average_difference
 """
+
 black = (0,0,0)
 white = (255,255,255)
 
@@ -156,18 +155,18 @@ def enter_riot_id():
         pygame.display.update()
         clock = pygame.time.Clock()
         clock.tick(15)
-    choose_analysis_screen(riot_name)
+    main_screen(riot_name)
 
-def choose_analysis_screen(riot_id_and_name):
+def main_screen(riot_id_and_name):
 
-    def get_puuid(name, riot_id, api_key):
+    def get_puuid(name, riot_id):
         puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
         resp = requests.get(puuid_url)
         account_info = resp.json()
         puuid = account_info["puuid"]
         return puuid
 
-    def get_match_history(puuid, api_key):
+    def get_match_history(puuid):
         api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/' + puuid + '/ids?start=0&count=20&api_key='+ api_key
         resp = requests.get(api_url)
         match_history = resp.json()
@@ -176,8 +175,8 @@ def choose_analysis_screen(riot_id_and_name):
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
-    puuid = get_puuid(riot_name, riot_id, api_key)
-    match_history = get_match_history(puuid, api_key)
+    puuid = get_puuid(riot_name, riot_id)
+    matchHistory = get_match_history(puuid)
 
     done = False
     window.fill(black)
@@ -187,11 +186,12 @@ def choose_analysis_screen(riot_id_and_name):
             if event.type == pygame.QUIT: #if clock exit, quit game
                 pygame.quit()
                 quit()
-        button('average kda', screen_width/2, screen_height/2, 100, 100, green, bright_green, lambda: display_average_kda(puuid, match_history))
+        button('Average KDA', screen_width/2, screen_height/2, 150, 100, green, bright_green, lambda: display_average_kda(puuid, matchHistory))
+        button('Average CS difference', screen_width/7, screen_height/2, 150, 100, green, bright_green, lambda: display_average_cs_diff(puuid, matchHistory))
 
         largeText = pygame.font.SysFont("Georgia",25)
 
-        TextSurf, TextRect = text_objects('Data taken from last ' + str(len(match_history)) + ' games', largeText)
+        TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', largeText)
         TextRect.center = ((screen_width/2),(screen_height/6))
         window.blit(TextSurf, TextRect)
 
@@ -201,54 +201,61 @@ def choose_analysis_screen(riot_id_and_name):
 
         clock = pygame.time.Clock()
         clock.tick(15)
-    
 
-
-def display_average_kda(puuid, match_history):
-    average_kda = asyncio.run(get_average_kda(puuid, match_history))
+def display_average_kda(puuid, matchHistory):
+    average_kda = asyncio.run(get_average_kda(puuid, matchHistory))
     statText = pygame.font.SysFont("Georgia",20)
     textSurf, textRect = text_objects(str(average_kda), statText)
     window.blit(textSurf, textRect)
-    
-async def get_average_kda(puuid, match_history):
+
+def display_average_cs_diff(puuid, matchHistory):
+    average_cs_diff = asyncio.run(get_average_cs_diff(puuid, matchHistory))
+    font = pygame.font.SysFont("Ariel",25)
+    text = font.render((str(average_cs_diff)[0:3]), True, white)
+    window.blit(text, text.get_rect(center=(screen_width/2.3, screen_height/1.5)))
+
+
+async def get_average_kda(puuid, matchHistory):
     async with aiohttp.ClientSession() as session:
         sum = 0 
-        taskMatchH = get_tasks(session, match_history)
-        taskMatchH = await asyncio.gather(*taskMatchH)
-        for match in taskMatchH:
+        matchHistory = get_tasks(session, matchHistory)
+        matchHistory = await asyncio.gather(*matchHistory)
+        for match in matchHistory:
             match = await match.json()
             player_index = match['metadata']['participants'].index(puuid)
             sum += match['info']['participants'][player_index]['challenges']['kda']
-        return sum / len(match_history)
+        return sum / len(matchHistory)
 
-async def get_cs_diff(puuid, tasksMatchH):
+async def get_average_cs_diff(puuid, matchHistory):
     async with aiohttp.ClientSession() as session:    
-        total_difference = 0
+        totalDifference = 0
+        totalGames = len(matchHistory)
+        matchHistory = get_tasks(session, matchHistory)
+        matchHistory = await asyncio.gather(*matchHistory)
 
-        match_history = await asyncio.gather(tasksMatchH)
-        for match in tasksMatchH:
+        for match in matchHistory:
+
             match = await match.json()
-            my_index = match['metadata']['participants'].index(puuid)
-            if my_index > 4:
-                enemy_index = my_index - 5
+            myIndex = match['metadata']['participants'].index(puuid)
+
+            if myIndex > 4:
+                enemyIndex = myIndex - 5
             else:
-                enemy_index = my_index + 5
-            
+                enemyIndex = myIndex + 5
 
-            enemy_cs = match['info']['participants'][enemy_index]['totalMinionsKilled'] + match['info']['participants'][enemy_index]['neutralMinionsKilled']
-            my_cs = match['info']['participants'][my_index]['totalMinionsKilled'] + match['info']['participants'][my_index]['neutralMinionsKilled']
-
-            cs_difference = my_cs - enemy_cs
-            total_difference += cs_difference
+            enemyCs = match['info']['participants'][enemyIndex]['totalMinionsKilled'] + match['info']['participants'][enemyIndex]['neutralMinionsKilled']
+            myCs = match['info']['participants'][myIndex]['totalMinionsKilled'] + match['info']['participants'][myIndex]['neutralMinionsKilled']
+            csDifference = myCs - enemyCs
+            totalDifference += csDifference
     
-        average_difference = total_difference / len(match_history)
+        average_difference = totalDifference / totalGames
         return average_difference
 
-def get_tasks(session, match_history):
-        tasksMatchH = []
-        for match in match_history:
-            tasksMatchH.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
-        return tasksMatchH
+def get_tasks(session, matchHistory):
+        asyncMatchHistory = []
+        for match in matchHistory:
+            asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
+        return asyncMatchHistory
 
 
 
