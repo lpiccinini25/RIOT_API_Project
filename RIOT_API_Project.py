@@ -4,7 +4,6 @@ import pygame
 import asyncio
 import aiohttp
 import pygame.font
-
 pygame.init()
 
 black = (0,0,0)
@@ -12,6 +11,7 @@ white = (255,255,255)
 
 api_key = 'RGAPI-a076eb99-f790-4996-aeda-96f804bafddd'
 api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
+
 
 
 """
@@ -131,7 +131,7 @@ def enter_riot_id():
                     pygame.quit()
                     quit()
                 for box in input_boxes:
-                    done, text = box.handle_event(event)
+                    done, riot_name = box.handle_event(event)
         window.fill(black)
 
         for box in input_boxes:
@@ -139,23 +139,24 @@ def enter_riot_id():
             box.draw(screen)
         
 
-        largeText = pygame.font.SysFont("ariel",25)
-        text = font.render("Please Enter Your Riot name and Riot Id", True, white)
+        font = pygame.font.SysFont("Ariel",25)
+        text = font.render("Please enter your Riot name and Riot ID", True, white)
+        window.blit(text, text.get_rect(center=(screen_width/2, screen_height/2)))
 
-        TextSurf, TextRect = text_objects("Please Enter Your Riot name and Riot Id", largeText)
+        font = pygame.font.SysFont('Ariel', 20)
+        text = font.render('(Example: SummonerName#0000)', True, white)
+        window.blit(text, text.get_rect(center=(screen_width/2, screen_height/1.85)))
+
  
-        TextRect.center = ((screen_width/2),(screen_height/1.9))
         leagueLogo = pygame.image.load('LeagueOfLegends.png')
 
         leagueLogo = pygame.transform.smoothscale(leagueLogo, (leagueLogo.get_width()/1.5, leagueLogo.get_height()/1.5))
-        window.blit(leagueLogo, (screen_width/3.5,screen_height/8))
-
-        window.blit(TextSurf, TextRect)
+        window.blit(leagueLogo, leagueLogo.get_rect(center=(screen_width/2, screen_height/3.5)))
  
         pygame.display.update()
         clock = pygame.time.Clock()
         clock.tick(15)
-    choose_analysis_screen(text)
+    choose_analysis_screen(riot_name)
 
 def choose_analysis_screen(riot_id_and_name):
 
