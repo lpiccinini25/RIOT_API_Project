@@ -3,6 +3,7 @@ import requests
 import pygame
 import asyncio
 import aiohttp
+import pygame.font
 
 pygame.init()
 
@@ -46,7 +47,7 @@ green = (0,200,0)
 
 bright_red = (255,0,0)
 bright_green = (0,255,0)
-screen_width = 500
+screen_width = 1000
 screen_height = 500
 
 def text_objects(text, font): #create text objects
@@ -72,7 +73,7 @@ def button(msg,x,y,w,h,ic,ac,action=None): #add button function
 
 
 screen = pygame.display.set_mode((640, 480))
-COLOR_INACTIVE = pygame.Color('lightskyblue3')
+COLOR_INACTIVE = white
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 FONT = pygame.font.Font(None, 32)
 
@@ -122,7 +123,7 @@ class SummonerIDInputBox:
 
 def enter_riot_id():
     done = False
-    input_riot_id = SummonerIDInputBox(screen_width/1.3, screen_height/2, 300, 25)
+    input_riot_id = SummonerIDInputBox(screen_width/2.5, screen_height/1.7, 100, 25)
     input_boxes = [input_riot_id]
     while not done: 
         for event in pygame.event.get():
@@ -139,10 +140,15 @@ def enter_riot_id():
         
 
         largeText = pygame.font.SysFont("ariel",25)
+        text = font.render("Please Enter Your Riot name and Riot Id", True, white)
 
         TextSurf, TextRect = text_objects("Please Enter Your Riot name and Riot Id", largeText)
  
-        TextRect.center = ((screen_width/1.035),(screen_height/3))
+        TextRect.center = ((screen_width/2),(screen_height/1.9))
+        leagueLogo = pygame.image.load('LeagueOfLegends.png')
+
+        leagueLogo = pygame.transform.smoothscale(leagueLogo, (leagueLogo.get_width()/1.5, leagueLogo.get_height()/1.5))
+        window.blit(leagueLogo, (screen_width/3.5,screen_height/8))
 
         window.blit(TextSurf, TextRect)
  
@@ -152,6 +158,7 @@ def enter_riot_id():
     choose_analysis_screen(text)
 
 def choose_analysis_screen(riot_id_and_name):
+
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
@@ -225,6 +232,7 @@ def get_match_history(puuid, api_key):
 
 
 window = pygame.display.set_mode((1000,550))
+pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
 
 
