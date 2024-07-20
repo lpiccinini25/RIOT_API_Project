@@ -160,11 +160,25 @@ def enter_riot_id():
 
 def choose_analysis_screen(riot_id_and_name):
 
+    def get_puuid(name, riot_id, api_key):
+        puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
+        resp = requests.get(puuid_url)
+        account_info = resp.json()
+        puuid = account_info["puuid"]
+        return puuid
+
+    def get_match_history(puuid, api_key):
+        api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/' + puuid + '/ids?start=0&count=20&api_key='+ api_key
+        resp = requests.get(api_url)
+        match_history = resp.json()
+        return match_history 
+
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
     puuid = get_puuid(riot_name, riot_id, api_key)
     match_history = get_match_history(puuid, api_key)
+
     done = False
     window.fill(black)
 
@@ -181,6 +195,8 @@ def choose_analysis_screen(riot_id_and_name):
         TextRect.center = ((screen_width/2),(screen_height/6))
         window.blit(TextSurf, TextRect)
 
+        
+
         pygame.display.update()
 
         clock = pygame.time.Clock()
@@ -193,41 +209,47 @@ def display_average_kda(puuid, match_history):
     statText = pygame.font.SysFont("Georgia",20)
     textSurf, textRect = text_objects(str(average_kda), statText)
     window.blit(textSurf, textRect)
-
-def get_tasks(session, match_history):
-    tasks = []
-    for match in match_history:
-        tasks.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
-    return tasks
-
-
+    
 async def get_average_kda(puuid, match_history):
     async with aiohttp.ClientSession() as session:
         sum = 0 
-        tasks = get_tasks(session, match_history)
-        responses = await asyncio.gather(*tasks)
-        for response in responses:
-            match_broad = await response.json()
-            player_index = match_broad['metadata']['participants'].index(puuid)
-            playerGameStats = match_broad['info']['participants'][player_index]['challenges']
-            sum += playerGameStats['kda']
+        taskMatchH = get_tasks(session, match_history)
+        taskMatchH = await asyncio.gather(*taskMatchH)
+        for match in taskMatchH:
+            match = await match.json()
+            player_index = match['metadata']['participants'].index(puuid)
+            sum += match['info']['participants'][player_index]['challenges']['kda']
         return sum / len(match_history)
 
+async def get_cs_diff(puuid, tasksMatchH):
+    async with aiohttp.ClientSession() as session:    
+        total_difference = 0
 
+        match_history = await asyncio.gather(tasksMatchH)
+        for match in tasksMatchH:
+            match = await match.json()
+            my_index = match['metadata']['participants'].index(puuid)
+            if my_index > 4:
+                enemy_index = my_index - 5
+            else:
+                enemy_index = my_index + 5
+            
 
+            enemy_cs = match['info']['participants'][enemy_index]['totalMinionsKilled'] + match['info']['participants'][enemy_index]['neutralMinionsKilled']
+            my_cs = match['info']['participants'][my_index]['totalMinionsKilled'] + match['info']['participants'][my_index]['neutralMinionsKilled']
 
-def get_puuid(name, riot_id, api_key):
-    puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
-    resp = requests.get(puuid_url)
-    account_info = resp.json()
-    puuid = account_info["puuid"]
-    return puuid
+            cs_difference = my_cs - enemy_cs
+            total_difference += cs_difference
+    
+        average_difference = total_difference / len(match_history)
+        return average_difference
 
-def get_match_history(puuid, api_key):
-    api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/by-puuid/' + puuid + '/ids?start=0&count=20&api_key='+ api_key
-    resp = requests.get(api_url)
-    match_history = resp.json()
-    return match_history 
+def get_tasks(session, match_history):
+        tasksMatchH = []
+        for match in match_history:
+            tasksMatchH.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
+        return tasksMatchH
+
 
 
 
