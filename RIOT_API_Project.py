@@ -4,39 +4,10 @@ import pygame
 import asyncio
 import aiohttp
 import pygame.font
+
 pygame.init()
 
-black = (0,0,0)
-white = (255,255,255)
-
 api_key = 'RGAPI-a076eb99-f790-4996-aeda-96f804bafddd'
-api_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/llimeincoconut/0000'
-
-"""
-def compare_cs(match_history, api_key):
-
-    total_difference = 0
-
-    for match in match_history:
-        api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key
-        resp = requests.get(api_url)
-        stats = resp.json()
-        my_index = stats['metadata']['participants'].index(puuid)
-        if my_index > 4:
-            enemy_index = my_index - 5
-        else:
-            enemy_index = my_index + 5
-        
-
-        enemy_cs = stats['info']['participants'][enemy_index]['totalMinionsKilled'] + stats['info']['participants'][enemy_index]['neutralMinionsKilled']
-        my_cs = stats['info']['participants'][my_index]['totalMinionsKilled'] + stats['info']['participants'][my_index]['neutralMinionsKilled']
-
-        cs_difference = my_cs - enemy_cs
-        total_difference += cs_difference
-    
-    average_difference = total_difference / len(match_history)
-    return average_difference
-"""
 
 black = (0,0,0)
 white = (255,255,255)
