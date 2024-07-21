@@ -131,9 +131,6 @@ def main_screen(riot_id_and_name):
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
 
-    puuid = get_puuid(riot_name, riot_id)
-    matchHistory = get_match_history(puuid)
-
     def get_puuid(name, riot_id):
         puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
         resp = requests.get(puuid_url)
@@ -146,6 +143,9 @@ def main_screen(riot_id_and_name):
         resp = requests.get(api_url)
         match_history = resp.json()
         return match_history 
+    
+    puuid = get_puuid(riot_name, riot_id)
+    matchHistory = get_match_history(puuid)
     
     regularText = pygame.font.SysFont('Georgia', 15)
     def createTextBox(x, y, msg):
