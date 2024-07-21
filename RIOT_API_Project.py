@@ -93,7 +93,7 @@ def enter_riot_id():
     input_riot_id = SummonerIDInputBox(screen_width/2.5, screen_height/1.7, 100, 25)
     input_boxes = [input_riot_id]
     done = False
-    
+
     while not done: 
         for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
@@ -106,7 +106,6 @@ def enter_riot_id():
         for box in input_boxes:
             box.update()
             box.draw(screen)
-        
 
         font = pygame.font.SysFont("Ariel",25)
         text = font.render("Please enter your Riot name and Riot ID", True, white)
@@ -128,6 +127,13 @@ def enter_riot_id():
 
 def main_screen(riot_id_and_name):
 
+    riot_id_and_name = riot_id_and_name.split("#")
+    riot_name = riot_id_and_name[0]
+    riot_id = riot_id_and_name[1]
+
+    puuid = get_puuid(riot_name, riot_id)
+    matchHistory = get_match_history(puuid)
+
     def get_puuid(name, riot_id):
         puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
         resp = requests.get(puuid_url)
@@ -140,16 +146,14 @@ def main_screen(riot_id_and_name):
         resp = requests.get(api_url)
         match_history = resp.json()
         return match_history 
-
-    riot_id_and_name = riot_id_and_name.split("#")
-    riot_name = riot_id_and_name[0]
-    riot_id = riot_id_and_name[1]
-
-    puuid = get_puuid(riot_name, riot_id)
-    matchHistory = get_match_history(puuid)
+    
+    regularText = pygame.font.SysFont('Georgia', 15)
+    def createTextBox(x, y, msg):
+        TextSurf, TextRect = text_objects(msg, regularText)
+        TextRect.update(x, y, 10, 10)
+        window.blit(TextSurf, TextRect)
 
     window.fill(black)
-    done = False
 
     average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
     average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
@@ -157,35 +161,26 @@ def main_screen(riot_id_and_name):
     winrate = winrate[0:4]
     winrate = float(winrate)
 
+    superSmallText = pygame.font.SysFont("Georgia",20)
+    TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
+    TextRect.update(screen_width/40, screen_height/30, 10, 10)
+    window.blit(TextSurf, TextRect)
 
+    xAlignment1 = screen_width * 1/12
+    createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
+    createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
+    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + str(int(winrate * 100)) + '%' )
+
+    done = False
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #if clock exit, quit game
                 pygame.quit()
                 quit()
 
-        superSmallText = pygame.font.SysFont("Ariel",20)
-        TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
-        TextRect.update(screen_width/40, screen_height/30, 10, 10)
-        window.blit(TextSurf, TextRect)
-
-        xAlignment1 = screen_width * 1/12
-
-        createTextBox(xAlignment1, screen_height*1/7, 'Average KDA Difference: ' + average_kda)
-
-        createTextBox(xAlignment1, screen_height*2/7, 'Average CS Difference: ' + average_cs_diff)
-
-        createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + str(int(winrate * 100)) + '%' )
-
         pygame.display.update()
         clock = pygame.time.Clock()
         clock.tick(15)
-
-def createTextBox(x, y, msg):
-    regularText = pygame.font.SysFont('Georgia', 15)
-    TextSurf, TextRect = text_objects(msg, regularText)
-    TextRect.update(x, y, 10, 10)
-    window.blit(TextSurf, TextRect)
 
 async def get_average_kda(puuid, matchHistory):
     async with aiohttp.ClientSession() as session:
@@ -247,8 +242,3 @@ def get_tasks(session, matchHistory):
 window = pygame.display.set_mode((1000,550))
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
-
-
-
-        
-
