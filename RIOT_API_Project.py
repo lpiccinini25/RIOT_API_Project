@@ -24,7 +24,6 @@ def text_objects(text, font): #create text objects
     textSurface = font.render(text, True, white)
     return textSurface, textSurface.get_rect()
 
-
 def button(msg,x,y,w,h,ic,ac,action=None): #add button function
     mouse = pygame.mouse.get_pos()
     click = pygame.mouse.get_pressed()
@@ -41,12 +40,10 @@ def button(msg,x,y,w,h,ic,ac,action=None): #add button function
         textRect.center = ( (x+(w/2)), (y+(h/2)) )
         window.blit(textSurf, textRect)
 
-
 screen = pygame.display.set_mode((640, 480))
 COLOR_INACTIVE = white
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 FONT = pygame.font.Font(None, 32)
-
 
 class SummonerIDInputBox:
 
@@ -92,9 +89,11 @@ class SummonerIDInputBox:
         pygame.draw.rect(screen, self.color, self.rect, 2)
 
 def enter_riot_id():
-    done = False
+
     input_riot_id = SummonerIDInputBox(screen_width/2.5, screen_height/1.7, 100, 25)
     input_boxes = [input_riot_id]
+    done = False
+    
     while not done: 
         for event in pygame.event.get():
                 if event.type == pygame.QUIT: 
@@ -116,16 +115,15 @@ def enter_riot_id():
         font = pygame.font.SysFont('Ariel', 20)
         text = font.render('(Example: SummonerName#0000)', True, white)
         window.blit(text, text.get_rect(center=(screen_width/2, screen_height/1.85)))
-
  
         leagueLogo = pygame.image.load('LeagueOfLegends.png')
-
         leagueLogo = pygame.transform.smoothscale(leagueLogo, (leagueLogo.get_width()/1.5, leagueLogo.get_height()/1.5))
         window.blit(leagueLogo, leagueLogo.get_rect(center=(screen_width/2, screen_height/3.5)))
  
         pygame.display.update()
         clock = pygame.time.Clock()
         clock.tick(15)
+
     main_screen(riot_name)
 
 def main_screen(riot_id_and_name):
@@ -155,6 +153,10 @@ def main_screen(riot_id_and_name):
 
     average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
     average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
+    winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
+    winrate = winrate[0:4]
+    winrate = float(winrate)
+
 
     while not done:
         for event in pygame.event.get():
@@ -162,9 +164,6 @@ def main_screen(riot_id_and_name):
                 pygame.quit()
                 quit()
 
-        button('Average KDA', screen_width/2, screen_height/2, 150, 100, green, bright_green, lambda: display_average_kda(puuid, matchHistory))
-        button('Average CS Difference', screen_width/7, screen_height/2, 150, 100, green, bright_green, lambda: display_average_cs_diff(puuid, matchHistory))
-    """
         superSmallText = pygame.font.SysFont("Ariel",20)
         TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
         TextRect.update(screen_width/40, screen_height/30, 10, 10)
@@ -173,7 +172,10 @@ def main_screen(riot_id_and_name):
         xAlignment1 = screen_width * 1/12
 
         createTextBox(xAlignment1, screen_height*1/7, 'Average KDA Difference: ' + average_kda)
+
         createTextBox(xAlignment1, screen_height*2/7, 'Average CS Difference: ' + average_cs_diff)
+
+        createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + str(int(winrate * 100)) + '%' )
 
         pygame.display.update()
         clock = pygame.time.Clock()
@@ -184,7 +186,6 @@ def createTextBox(x, y, msg):
     TextSurf, TextRect = text_objects(msg, regularText)
     TextRect.update(x, y, 10, 10)
     window.blit(TextSurf, TextRect)
-
 
 async def get_average_kda(puuid, matchHistory):
     async with aiohttp.ClientSession() as session:
@@ -221,13 +222,27 @@ async def get_average_cs_diff(puuid, matchHistory):
         average_difference = totalDifference / totalGames
         return average_difference
 
+async def get_winrate(puuid, matchHistory):
+    async with aiohttp.ClientSession() as session:  
+        wins = 0
+        total_games = len(matchHistory)
+        matchHistory = get_tasks(session, matchHistory)
+        matchHistory = await asyncio.gather(*matchHistory)
+
+        for match in matchHistory:
+            match = await match.json()
+            myIndex = match['metadata']['participants'].index(puuid)
+            if match['info']['participants'][myIndex]['win'] == True:
+                wins += 1
+        
+        return wins / total_games
+
 def get_tasks(session, matchHistory):
         asyncMatchHistory = []
         for match in matchHistory:
             time.sleep(0.25)
             asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
         return asyncMatchHistory
-
 
 window = pygame.display.set_mode((1000,550))
 pygame.display.set_caption("Riot Api Project")
