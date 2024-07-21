@@ -3,6 +3,7 @@ import requests
 import pygame
 import asyncio
 import aiohttp
+import time
 
 pygame.init()
 
@@ -152,6 +153,9 @@ def main_screen(riot_id_and_name):
     window.fill(black)
     done = False
 
+    average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
+    average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
+
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #if clock exit, quit game
@@ -160,27 +164,26 @@ def main_screen(riot_id_and_name):
 
         button('Average KDA', screen_width/2, screen_height/2, 150, 100, green, bright_green, lambda: display_average_kda(puuid, matchHistory))
         button('Average CS Difference', screen_width/7, screen_height/2, 150, 100, green, bright_green, lambda: display_average_cs_diff(puuid, matchHistory))
-
-        largeText = pygame.font.SysFont("Georgia",10)
-        TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', largeText)
-        TextRect.center = ((screen_width/2),(screen_height/2))
+    """
+        superSmallText = pygame.font.SysFont("Ariel",20)
+        TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
+        TextRect.update(screen_width/40, screen_height/30, 10, 10)
         window.blit(TextSurf, TextRect)
+
+        xAlignment1 = screen_width * 1/12
+
+        createTextBox(xAlignment1, screen_height*1/7, 'Average KDA Difference: ' + average_kda)
+        createTextBox(xAlignment1, screen_height*2/7, 'Average CS Difference: ' + average_cs_diff)
 
         pygame.display.update()
         clock = pygame.time.Clock()
         clock.tick(15)
 
-def display_average_kda(puuid, matchHistory):
-    average_kda = asyncio.run(get_average_kda(puuid, matchHistory))
-    statText = pygame.font.SysFont("Georgia",20)
-    textSurf, textRect = text_objects(str(average_kda), statText)
-    window.blit(textSurf, textRect)
-
-def display_average_cs_diff(puuid, matchHistory):
-    average_cs_diff = asyncio.run(get_average_cs_diff(puuid, matchHistory))
-    font = pygame.font.SysFont("Ariel",25)
-    text = font.render((str(average_cs_diff)[0:3]), True, white)
-    window.blit(text, text.get_rect(center=(screen_width/2.3, screen_height/1.5)))
+def createTextBox(x, y, msg):
+    regularText = pygame.font.SysFont('Georgia', 15)
+    TextSurf, TextRect = text_objects(msg, regularText)
+    TextRect.update(x, y, 10, 10)
+    window.blit(TextSurf, TextRect)
 
 
 async def get_average_kda(puuid, matchHistory):
@@ -202,7 +205,6 @@ async def get_average_cs_diff(puuid, matchHistory):
         matchHistory = await asyncio.gather(*matchHistory)
 
         for match in matchHistory:
-
             match = await match.json()
             myIndex = match['metadata']['participants'].index(puuid)
 
@@ -222,11 +224,9 @@ async def get_average_cs_diff(puuid, matchHistory):
 def get_tasks(session, matchHistory):
         asyncMatchHistory = []
         for match in matchHistory:
+            time.sleep(0.25)
             asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
         return asyncMatchHistory
-
-
-
 
 
 window = pygame.display.set_mode((1000,550))
