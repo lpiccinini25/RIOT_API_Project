@@ -6,7 +6,7 @@ import aiohttp
 
 pygame.init()
 
-api_key = 'RGAPI-a076eb99-f790-4996-aeda-96f804bafddd'
+api_key = 'RGAPI-68215b62-e28c-4508-93e2-d405e3c30d02'
 
 black = (0,0,0)
 white = (255,255,255)
