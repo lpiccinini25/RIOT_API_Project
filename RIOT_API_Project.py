@@ -146,7 +146,7 @@ def main_screen(riot_id_and_name):
     
     puuid = get_puuid(riot_name, riot_id)
     matchHistory = get_match_history(puuid)
-    
+
     regularText = pygame.font.SysFont('Georgia', 15)
     def createTextBox(x, y, msg):
         TextSurf, TextRect = text_objects(msg, regularText)
@@ -158,8 +158,6 @@ def main_screen(riot_id_and_name):
     average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
     average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
     winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
-    winrate = winrate[0:4]
-    winrate = float(winrate)
 
     superSmallText = pygame.font.SysFont("Georgia",20)
     TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
@@ -191,7 +189,10 @@ async def get_average_kda(puuid, matchHistory):
             match = await match.json()
             player_index = match['metadata']['participants'].index(puuid)
             sum += match['info']['participants'][player_index]['challenges']['kda']
-        return sum / len(matchHistory)
+        
+        KDA =  str(sum / len(matchHistory))
+        KDA = float(KDA[0:5])
+        return str(KDA)
 
 async def get_average_cs_diff(puuid, matchHistory):
     async with aiohttp.ClientSession() as session:    
@@ -230,7 +231,11 @@ async def get_winrate(puuid, matchHistory):
             if match['info']['participants'][myIndex]['win'] == True:
                 wins += 1
         
-        return wins / total_games
+        wins = wins / total_games
+        winrate = str(wins)
+        winrate = winrate[0:4]
+        winrate = float(winrate)
+        return winrate
 
 def get_tasks(session, matchHistory):
         asyncMatchHistory = []
