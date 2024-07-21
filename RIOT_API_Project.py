@@ -3,7 +3,6 @@ import requests
 import pygame
 import asyncio
 import aiohttp
-import pygame.font
 
 pygame.init()
 
@@ -146,30 +145,28 @@ def main_screen(riot_id_and_name):
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
+
     puuid = get_puuid(riot_name, riot_id)
     matchHistory = get_match_history(puuid)
 
-    done = False
     window.fill(black)
+    done = False
 
     while not done:
         for event in pygame.event.get():
             if event.type == pygame.QUIT: #if clock exit, quit game
                 pygame.quit()
                 quit()
+
         button('Average KDA', screen_width/2, screen_height/2, 150, 100, green, bright_green, lambda: display_average_kda(puuid, matchHistory))
-        button('Average CS difference', screen_width/7, screen_height/2, 150, 100, green, bright_green, lambda: display_average_cs_diff(puuid, matchHistory))
+        button('Average CS Difference', screen_width/7, screen_height/2, 150, 100, green, bright_green, lambda: display_average_cs_diff(puuid, matchHistory))
 
-        largeText = pygame.font.SysFont("Georgia",25)
-
+        largeText = pygame.font.SysFont("Georgia",10)
         TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', largeText)
-        TextRect.center = ((screen_width/2),(screen_height/6))
+        TextRect.center = ((screen_width/2),(screen_height/2))
         window.blit(TextSurf, TextRect)
 
-        
-
         pygame.display.update()
-
         clock = pygame.time.Clock()
         clock.tick(15)
 
