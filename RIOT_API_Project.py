@@ -167,7 +167,7 @@ def main_screen(riot_id_and_name):
     xAlignment1 = screen_width * 1/12
     createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
     createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
-    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + str(int(winrate * 100)) + '%' )
+    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
 
     done = False
     while not done:
@@ -191,7 +191,7 @@ async def get_average_kda(puuid, matchHistory):
             sum += match['info']['participants'][player_index]['challenges']['kda']
         
         KDA =  str(sum / len(matchHistory))
-        KDA = float(KDA[0:5])
+        KDA = float(KDA[0:4])
         return str(KDA)
 
 async def get_average_cs_diff(puuid, matchHistory):
@@ -233,14 +233,14 @@ async def get_winrate(puuid, matchHistory):
         
         wins = wins / total_games
         winrate = str(wins)
-        winrate = winrate[0:4]
-        winrate = float(winrate)
+        winrate = float(winrate[0:5])
+        winrate = str(float(winrate) * 100)[0:2]
         return winrate
 
 def get_tasks(session, matchHistory):
         asyncMatchHistory = []
         for match in matchHistory:
-            time.sleep(0.25)
+            time.sleep(0.50)
             asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
         return asyncMatchHistory
 
