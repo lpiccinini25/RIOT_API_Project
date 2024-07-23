@@ -6,9 +6,11 @@ import aiohttp
 import time
 import os 
 
+window = pygame.display.set_mode((1000,550))
+
 pygame.init()
 
-api_key = 'RGAPI-68215b62-e28c-4508-93e2-d405e3c30d02'
+api_key = 'RGAPI-49cc35ef-fab2-4de5-b41e-b76d2092baee'
 
 black = (0,0,0)
 white = (255,255,255)
@@ -41,7 +43,6 @@ def button(msg,x,y,w,h,ic,ac,action=None): #add button function
         textRect.center = ( (x+(w/2)), (y+(h/2)) )
         window.blit(textSurf, textRect)
 
-screen = pygame.display.set_mode((640, 480))
 COLOR_INACTIVE = white
 COLOR_ACTIVE = pygame.Color('dodgerblue2')
 FONT = pygame.font.Font(None, 32)
@@ -83,11 +84,11 @@ class SummonerIDInputBox:
         width = max(200, self.txt_surface.get_width()+10)
         self.rect.w = width
 
-    def draw(self, screen):
+    def draw(self, window):
         # Blit the text.
-        screen.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
+        window.blit(self.txt_surface, (self.rect.x+5, self.rect.y+5))
         # Blit the rect.
-        pygame.draw.rect(screen, self.color, self.rect, 2)
+        pygame.draw.rect(window, self.color, self.rect, 2)
 
 def enter_riot_id():
 
@@ -106,7 +107,7 @@ def enter_riot_id():
 
         for box in input_boxes:
             box.update()
-            box.draw(screen)
+            box.draw(window)
 
         font = pygame.font.SysFont("Ariel",25)
         text = font.render("Please enter your Riot name and Riot ID", True, white)
@@ -119,9 +120,6 @@ def enter_riot_id():
         leagueLogo = pygame.image.load('LeagueOfLegends.png')
         leagueLogo = pygame.transform.smoothscale(leagueLogo, (leagueLogo.get_width()/1.5, leagueLogo.get_height()/1.5))
         window.blit(leagueLogo, leagueLogo.get_rect(center=(screen_width/2, screen_height/3.5)))
-
-        #icon = pygame.image.load(os.path.abspath("C:\Users\Lucap\Downloads\dragontail-14.14.1.tgz\\" + "14.14.1\img\profileicon" + "\\" + "10"))
-        #window.blit(icon, icon.get_rect(center=(screen_width/2, screen_height/1.5)))
  
         pygame.display.update()
         clock = pygame.time.Clock()
@@ -131,9 +129,16 @@ def enter_riot_id():
 
 def main_screen(riot_id_and_name):
 
+
+
+    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + ".png"))
+    window.blit(icon, icon.get_rect(center=(screen_width/2, screen_height/1.5)))
+
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
+
+    summoner_url = ''
 
     def get_puuid(name, riot_id):
         puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
@@ -160,8 +165,8 @@ def main_screen(riot_id_and_name):
     window.fill(black)
 
     average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
-    average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
-    winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
+    #average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
+    #winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
 
     superSmallText = pygame.font.SysFont("Georgia",20)
     TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
@@ -170,8 +175,8 @@ def main_screen(riot_id_and_name):
 
     xAlignment1 = screen_width * 1/12
     createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
-    createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
-    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
+    #createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
+    #createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
 
     done = False
     while not done:
@@ -248,6 +253,5 @@ def get_tasks(session, matchHistory):
             asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
         return asyncMatchHistory
 
-window = pygame.display.set_mode((1000,550))
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
