@@ -159,17 +159,17 @@ def main_screen(riot_id_and_name):
         summonerId = match['info']['participants'][playerIndex]['summonerId']
         return summonerId
 
-    def get_ProfileIcon_and_Level(summonerId):
+    def get_summonerInformation(summonerId):
         api_url = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/' + summonerId + '?api_key=' + api_key
         resp = requests.get(api_url)
         summonerInfo = resp.json()
-        return summonerInfo['profileIconId'], summonerInfo['summonerLevel']
+        return summonerInfo['profileIconId'], summonerInfo['summonerLevel'], summonerInfo['accountId']
     
     summonerId = get_SummonerId(puuid, matchHistory)
-    IconId, summonerLevel =  get_ProfileIcon_and_Level(summonerId)
+    IconId, summonerLevel, accountId =  get_summonerInformation(summonerId)
 
     font = pygame.font.SysFont('Ariel', 30)
-    text = font.render(str(summonerLevel), True, white)
+    text = font.render('Level: ' + str(summonerLevel), True, white)
     window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 6/7)))
 
     icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(IconId) + ".png"))
