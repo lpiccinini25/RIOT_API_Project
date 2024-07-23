@@ -1,10 +1,32 @@
-
 import requests
 import pygame
 import asyncio
 import aiohttp
 import time
 import os 
+
+
+async def updateChampionJson():
+    async with aiohttp.ClientSession() as session:
+        latest = await session.get("https://ddragon.leagueoflegends.com/api/versions.json")
+        version = await latest.json()
+
+        ddragon = await session.get('https://ddragon.leagueoflegends.com/cdn/' + version[0] + '/data/en_US/champion.json')
+        championJson = await ddragon.json()
+        return championJson['data']
+
+championIdToName = dict()
+
+async def keyToCharacterDict(championId=None):
+    if championId not in championIdToName:
+        for champion in championJson:
+            championIdToName[championJson[champion]['key']] = championJson[champion]['name']
+    else:
+        return championIdToName[championId]
+
+championJson = asyncio.run(updateChampionJson())
+asyncio.run(keyToCharacterDict())
+
 
 window = pygame.display.set_mode((1000,550))
 
