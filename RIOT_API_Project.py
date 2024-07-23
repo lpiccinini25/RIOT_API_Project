@@ -159,17 +159,21 @@ def main_screen(riot_id_and_name):
         summonerId = match['info']['participants'][playerIndex]['summonerId']
         return summonerId
 
-    def get_ProfileIcon(summonerId):
+    def get_ProfileIcon_and_Level(summonerId):
         api_url = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/' + summonerId + '?api_key=' + api_key
         resp = requests.get(api_url)
         summonerInfo = resp.json()
-        return summonerInfo['profileIconId']
+        return summonerInfo['profileIconId'], summonerInfo['summonerLevel']
     
     summonerId = get_SummonerId(puuid, matchHistory)
-    ProfileId = str(get_ProfileIcon(summonerId))
+    IconId, summonerLevel =  get_ProfileIcon_and_Level(summonerId)
 
-    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + ProfileId + ".png"))
-    window.blit(icon, icon.get_rect(center=(screen_width * 5/7, screen_height/2)))
+    font = pygame.font.SysFont('Ariel', 30)
+    text = font.render(str(summonerLevel), True, white)
+    window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 6/7)))
+
+    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(IconId) + ".png"))
+    window.blit(icon, icon.get_rect(center=(screen_width * 3/4, screen_height/2)))
 
     regularText = pygame.font.SysFont('Georgia', 15)
     def createTextBox(x, y, msg):
