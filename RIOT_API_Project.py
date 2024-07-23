@@ -168,8 +168,8 @@ def main_screen(riot_id_and_name):
     summonerId = get_SummonerId(puuid, matchHistory)
     ProfileId = str(get_ProfileIcon(summonerId))
 
-    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(get_ProfileIcon(summonerId)) + ".png"))
-    window.blit(icon, icon.get_rect(center=(screen_width/2, screen_height/2)))
+    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + ProfileId + ".png"))
+    window.blit(icon, icon.get_rect(center=(screen_width * 5/7, screen_height/2)))
 
     regularText = pygame.font.SysFont('Georgia', 15)
     def createTextBox(x, y, msg):
