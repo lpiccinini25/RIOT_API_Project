@@ -206,6 +206,13 @@ def main_screen(riot_id_and_name):
         clock = pygame.time.Clock()
         clock.tick(15)
 
+def get_tasks(session, matchHistory):
+        asyncMatchHistory = []
+        for match in matchHistory:
+            time.sleep(0.50)
+            asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
+        return asyncMatchHistory
+
 async def get_average_kda(puuid, matchHistory):
     async with aiohttp.ClientSession() as session:
         sum = 0 
@@ -262,13 +269,6 @@ async def get_winrate(puuid, matchHistory):
         winrate = float(winrate[0:5])
         winrate = str(float(winrate) * 100)[0:2]
         return winrate
-
-def get_tasks(session, matchHistory):
-        asyncMatchHistory = []
-        for match in matchHistory:
-            time.sleep(0.50)
-            asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
-        return asyncMatchHistory
 
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
