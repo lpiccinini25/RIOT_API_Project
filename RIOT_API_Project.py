@@ -5,6 +5,9 @@ import aiohttp
 import time
 import os 
 
+pygame.init()
+
+api_key = 'RGAPI-49cc35ef-fab2-4de5-b41e-b76d2092baee'
 
 async def updateChampionJson():
     async with aiohttp.ClientSession() as session:
@@ -15,33 +18,26 @@ async def updateChampionJson():
         championJson = await ddragon.json()
         return championJson['data']
 
-championIdToName = dict()
-
 async def keyToCharacterDict(championId=None):
     if championId not in championIdToName:
         for champion in championJson:
-            championIdToName[championJson[champion]['key']] = championJson[champion]['name']
+            champion = champion.split()
+            if len(champion) > 1:
+                champion = champion[0] + champion[1]
+            else:
+                champion = champion[0]
+            championIdToName[championJson[champion]['key']] = champion
     else:
         return championIdToName[championId]
 
+championIdToName = dict()
 championJson = asyncio.run(updateChampionJson())
-asyncio.run(keyToCharacterDict())
-
+asyncio.run(keyToCharacterDict('5'))
 
 window = pygame.display.set_mode((1000,550))
 
-pygame.init()
-
-api_key = 'RGAPI-49cc35ef-fab2-4de5-b41e-b76d2092baee'
-
 black = (0,0,0)
 white = (255,255,255)
-
-red = (200,0,0)
-green = (0,200,0)
-
-bright_red = (255,0,0)
-bright_green = (0,255,0)
 screen_width = 1000
 screen_height = 500
 
@@ -173,7 +169,7 @@ def main_screen(riot_id_and_name):
     puuid = get_puuid(riot_name, riot_id)
     matchHistory = get_match_history(puuid)
 
-    def get_SummonerId(puuid, matchHistory):
+    def get_summonerId(puuid, matchHistory):
         api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + matchHistory[0] + '?api_key=' + api_key
         resp = requests.get(api_url)
         match = resp.json()
@@ -187,15 +183,19 @@ def main_screen(riot_id_and_name):
         summonerInfo = resp.json()
         return summonerInfo['profileIconId'], summonerInfo['summonerLevel'], summonerInfo['accountId']
     
-    summonerId = get_SummonerId(puuid, matchHistory)
+    summonerId = get_summonerId(puuid, matchHistory)
     IconId, summonerLevel, accountId =  get_summonerInformation(summonerId)
 
     font = pygame.font.SysFont('Ariel', 30)
+    text = font.render(riot_name + '#' + riot_id, True, white)
+    window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 3/30)))
+
+    font = pygame.font.SysFont('Ariel', 30)
     text = font.render('Level: ' + str(summonerLevel), True, white)
-    window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 6/7)))
+    window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 24/30)))
 
     icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(IconId) + ".png"))
-    window.blit(icon, icon.get_rect(center=(screen_width * 3/4, screen_height/2)))
+    window.blit(icon, icon.get_rect(center=(screen_width * 3/4, screen_height * 4/9)))
 
     regularText = pygame.font.SysFont('Georgia', 15)
     def createTextBox(x, y, msg):
@@ -207,15 +207,17 @@ def main_screen(riot_id_and_name):
     average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
     winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
 
+    xAlignment1 = screen_width * 1/12
+    createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
+    createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
+    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
+
     superSmallText = pygame.font.SysFont("Georgia",20)
     TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
     TextRect.update(screen_width/40, screen_height/30, 10, 10)
     window.blit(TextSurf, TextRect)
 
-    xAlignment1 = screen_width * 1/12
-    createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
-    createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
-    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
+    asyncio.run(display_championMastery(puuid))
 
     done = False
     while not done:
@@ -290,7 +292,31 @@ async def get_winrate(puuid, matchHistory):
         winrate = str(wins)
         winrate = float(winrate[0:5])
         winrate = str(float(winrate) * 100)[0:2]
+
         return winrate
+
+async def display_championMastery(puuid):
+    api_url = 'https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/' + puuid + '/top?count=3&api_key=' + api_key
+
+    async with aiohttp.ClientSession() as session:
+            resp = await session.get(api_url)
+            topMasteries = await resp.json()
+            space = 14
+            for mastery in topMasteries:
+                space += 1
+                x = screen_width * (int(space) / 18)
+                championId = mastery['championId']
+                championName = championIdToName[str(championId)]
+                championIcon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\champion" + "\\" + championName + ".png"))
+                championIcon = pygame.transform.smoothscale(championIcon, (championIcon.get_width()*1/2, championIcon.get_height()*1/2))
+                window.blit(championIcon, championIcon.get_rect(center=(x, screen_height*9/10)))
+
+
+
+
+
+    
+
 
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
