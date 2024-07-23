@@ -129,16 +129,11 @@ def enter_riot_id():
 
 def main_screen(riot_id_and_name):
 
-
-
-    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + ".png"))
-    window.blit(icon, icon.get_rect(center=(screen_width/2, screen_height/1.5)))
+    window.fill(black)
 
     riot_id_and_name = riot_id_and_name.split("#")
     riot_name = riot_id_and_name[0]
     riot_id = riot_id_and_name[1]
-
-    summoner_url = ''
 
     def get_puuid(name, riot_id):
         puuid_url = 'https://americas.api.riotgames.com/riot/account/v1/accounts/by-riot-id/' + name + '/' + riot_id + '?api_key=' + api_key
@@ -152,9 +147,29 @@ def main_screen(riot_id_and_name):
         resp = requests.get(api_url)
         match_history = resp.json()
         return match_history 
-    
+
     puuid = get_puuid(riot_name, riot_id)
     matchHistory = get_match_history(puuid)
+
+    def get_SummonerId(puuid, matchHistory):
+        api_url = 'https://americas.api.riotgames.com/lol/match/v5/matches/' + matchHistory[0] + '?api_key=' + api_key
+        resp = requests.get(api_url)
+        match = resp.json()
+        playerIndex = match['metadata']['participants'].index(puuid)
+        summonerId = match['info']['participants'][playerIndex]['summonerId']
+        return summonerId
+
+    def get_ProfileIcon(summonerId):
+        api_url = 'https://na1.api.riotgames.com/lol/summoner/v4/summoners/' + summonerId + '?api_key=' + api_key
+        resp = requests.get(api_url)
+        summonerInfo = resp.json()
+        return summonerInfo['profileIconId']
+    
+    summonerId = get_SummonerId(puuid, matchHistory)
+    ProfileId = str(get_ProfileIcon(summonerId))
+
+    icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(get_ProfileIcon(summonerId)) + ".png"))
+    window.blit(icon, icon.get_rect(center=(screen_width/2, screen_height/2)))
 
     regularText = pygame.font.SysFont('Georgia', 15)
     def createTextBox(x, y, msg):
@@ -162,11 +177,9 @@ def main_screen(riot_id_and_name):
         TextRect.update(x, y, 10, 10)
         window.blit(TextSurf, TextRect)
 
-    window.fill(black)
-
     average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
-    #average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
-    #winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
+    average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
+    winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
 
     superSmallText = pygame.font.SysFont("Georgia",20)
     TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
@@ -175,8 +188,8 @@ def main_screen(riot_id_and_name):
 
     xAlignment1 = screen_width * 1/12
     createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
-    #createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
-    #createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
+    createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
+    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
 
     done = False
     while not done:
