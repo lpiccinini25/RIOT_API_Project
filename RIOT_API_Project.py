@@ -4,6 +4,7 @@ import pygame
 import asyncio
 import aiohttp
 import time
+import os 
 
 pygame.init()
 
@@ -118,6 +119,9 @@ def enter_riot_id():
         leagueLogo = pygame.image.load('LeagueOfLegends.png')
         leagueLogo = pygame.transform.smoothscale(leagueLogo, (leagueLogo.get_width()/1.5, leagueLogo.get_height()/1.5))
         window.blit(leagueLogo, leagueLogo.get_rect(center=(screen_width/2, screen_height/3.5)))
+
+        #icon = pygame.image.load(os.path.abspath("C:\Users\Lucap\Downloads\dragontail-14.14.1.tgz\\" + "14.14.1\img\profileicon" + "\\" + "10"))
+        #window.blit(icon, icon.get_rect(center=(screen_width/2, screen_height/1.5)))
  
         pygame.display.update()
         clock = pygame.time.Clock()
