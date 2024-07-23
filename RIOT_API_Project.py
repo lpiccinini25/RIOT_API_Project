@@ -304,19 +304,12 @@ async def display_championMastery(puuid):
             space = 14
             for mastery in topMasteries:
                 space += 1
-                x = screen_width * (int(space) / 18)
+                x = screen_width * (space / 18)
                 championId = mastery['championId']
                 championName = championIdToName[str(championId)]
                 championIcon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\champion" + "\\" + championName + ".png"))
                 championIcon = pygame.transform.smoothscale(championIcon, (championIcon.get_width()*1/2, championIcon.get_height()*1/2))
                 window.blit(championIcon, championIcon.get_rect(center=(x, screen_height*9/10)))
-
-
-
-
-
-    
-
 
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
