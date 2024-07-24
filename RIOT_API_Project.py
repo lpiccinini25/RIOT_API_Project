@@ -197,11 +197,11 @@ def main_screen(riot_id_and_name):
     summonerId = get_summonerId(puuid, matchHistory)
     IconId, summonerLevel, accountId = get_summonerInformation(summonerId)
 
-    centeredTextBox(riot_name + '#' + riot_id, screen_width*3/4, screen_height * 3/30)
-    centeredTextBox('Level: ' + str(summonerLevel), screen_width*3/4, screen_height * 35/50)
+    centeredTextBox(riot_name + '#' + riot_id, screen_width*6/28, screen_height * 3/30)
+    centeredTextBox('Level: ' + str(summonerLevel), screen_width*6/28, screen_height * 35/50)
 
     icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(IconId) + ".png"))
-    window.blit(icon, icon.get_rect(center=(screen_width * 3/4, screen_height * 20/50)))
+    window.blit(icon, icon.get_rect(center=(screen_width * 6/28, screen_height * 20/50)))
 
     #average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
     #average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
@@ -213,6 +213,7 @@ def main_screen(riot_id_and_name):
     #uncenteredTextBox('Winrate: ' + winrate + '%', xAlignment1, screen_height*3/7)
 
     asyncio.run(display_championMastery(puuid))
+    asyncio.run(display_rankedInformation(summonerId))
 
     done = False
     while not done:
@@ -296,10 +297,10 @@ async def display_championMastery(puuid):
     async with aiohttp.ClientSession() as session:
         resp = await session.get(api_url)
         topMasteries = await resp.json()
-        space = 21
+        space = 6
         for mastery in topMasteries:
-            if space == 21:
-                x = screen_width * 21/28
+            if space == 6:
+                x = screen_width * 6/28
                 championId = mastery['championId']
                 championName = championIdToName[str(championId)]
                 championIcon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\champion" + "\\" + championName + ".png"))
@@ -309,7 +310,7 @@ async def display_championMastery(puuid):
                 masteryLevel = mastery['championLevel']
                 centeredTextBox('Mastery: ' + str(masteryLevel), x, screen_height*45/50)
 
-                space -= 3
+                space += 3
             else:
                 x = screen_width * (space / 28)
                 championId = mastery['championId']
@@ -320,7 +321,25 @@ async def display_championMastery(puuid):
 
                 masteryLevel = mastery['championLevel']
                 centeredTextBox('Mastery: ' + str(masteryLevel), x, screen_height*93/100)
-                space += 6
+                space -= 6
+
+async def display_rankedInformation(summonerId):
+    async with aiohttp.ClientSession() as session:
+        api_url = 'https://na1.api.riotgames.com/lol/league/v4/entries/by-summoner/' + summonerId + '?api_key=' + api_key
+        resp = await session.get(api_url)
+        rankedInfo = await resp.json()
+        rankedSolo = rankedInfo[0]
+        rank = rankedSolo['tier'] + ' ' + rankedSolo['rank']
+        lp = str(rankedSolo['leaguePoints']) + ' LP'
+
+        xAlignment = screen_width * 23/50
+
+        tierImage =  pygame.image.load(os.path.abspath('C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\rankedEmblems\\' + 'Rank=' + rankedSolo['tier'] + '.png'))
+        tierImage = pygame.transform.smoothscale(tierImage, (tierImage.get_width()*8/50, tierImage.get_height()*8/50))
+        window.blit(tierImage, tierImage.get_rect(center=(screen_width * 23/50, screen_height*10/50)))
+        centeredTextBox(rank + ' ' + lp, xAlignment, screen_height*16/50)
+
+
 
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
