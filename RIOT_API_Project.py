@@ -7,7 +7,7 @@ import os
 
 pygame.init()
 
-api_key = 'RGAPI-49cc35ef-fab2-4de5-b41e-b76d2092baee'
+api_key = 'RGAPI-56d7d549-29a2-4391-b827-e4ed8178bfe2'
 
 async def updateChampionJson():
     async with aiohttp.ClientSession() as session:
@@ -39,7 +39,17 @@ window = pygame.display.set_mode((1000,550))
 black = (0,0,0)
 white = (255,255,255)
 screen_width = 1000
-screen_height = 500
+screen_height = 550
+
+regularText = pygame.font.SysFont('Ariel', 25)
+def uncenteredTextBox(x, y, msg):
+    TextSurf, TextRect = text_objects(msg, regularText)
+    TextRect.update(x, y, 10, 10)
+    window.blit(TextSurf, TextRect)
+
+def centeredTextBox(msg, x, y):
+    text = regularText.render(msg, True, white)
+    window.blit(text, text.get_rect(center=(x, y)))
 
 def text_objects(text, font): #create text objects
     textSurface = font.render(text, True, white)
@@ -184,38 +194,22 @@ def main_screen(riot_id_and_name):
         return summonerInfo['profileIconId'], summonerInfo['summonerLevel'], summonerInfo['accountId']
     
     summonerId = get_summonerId(puuid, matchHistory)
-    IconId, summonerLevel, accountId =  get_summonerInformation(summonerId)
+    IconId, summonerLevel, accountId = get_summonerInformation(summonerId)
 
-    font = pygame.font.SysFont('Ariel', 30)
-    text = font.render(riot_name + '#' + riot_id, True, white)
-    window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 3/30)))
-
-    font = pygame.font.SysFont('Ariel', 30)
-    text = font.render('Level: ' + str(summonerLevel), True, white)
-    window.blit(text, text.get_rect(center=(screen_width*3/4, screen_height * 24/30)))
+    centeredTextBox(riot_name + '#' + riot_id, screen_width*3/4, screen_height * 3/30)
+    centeredTextBox('Level: ' + str(summonerLevel), screen_width*3/4, screen_height * 35/50)
 
     icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(IconId) + ".png"))
-    window.blit(icon, icon.get_rect(center=(screen_width * 3/4, screen_height * 4/9)))
+    window.blit(icon, icon.get_rect(center=(screen_width * 3/4, screen_height * 20/50)))
 
-    regularText = pygame.font.SysFont('Georgia', 15)
-    def createTextBox(x, y, msg):
-        TextSurf, TextRect = text_objects(msg, regularText)
-        TextRect.update(x, y, 10, 10)
-        window.blit(TextSurf, TextRect)
-
-    average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
-    average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
-    winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
+    #average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
+    #average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
+    #winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
 
     xAlignment1 = screen_width * 1/12
-    createTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
-    createTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
-    createTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
-
-    superSmallText = pygame.font.SysFont("Georgia",20)
-    TextSurf, TextRect = text_objects('Data taken from last ' + str(len(matchHistory)) + ' games', superSmallText)
-    TextRect.update(screen_width/40, screen_height/30, 10, 10)
-    window.blit(TextSurf, TextRect)
+    #uncenteredTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
+    #uncenteredTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
+    #uncenteredTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
 
     asyncio.run(display_championMastery(puuid))
 
@@ -299,17 +293,33 @@ async def display_championMastery(puuid):
     api_url = 'https://na1.api.riotgames.com/lol/champion-mastery/v4/champion-masteries/by-puuid/' + puuid + '/top?count=3&api_key=' + api_key
 
     async with aiohttp.ClientSession() as session:
-            resp = await session.get(api_url)
-            topMasteries = await resp.json()
-            space = 14
-            for mastery in topMasteries:
-                space += 1
-                x = screen_width * (space / 18)
+        resp = await session.get(api_url)
+        topMasteries = await resp.json()
+        space = 21
+        for mastery in topMasteries:
+            if space == 21:
+                x = screen_width * 21/28
                 championId = mastery['championId']
                 championName = championIdToName[str(championId)]
                 championIcon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\champion" + "\\" + championName + ".png"))
-                championIcon = pygame.transform.smoothscale(championIcon, (championIcon.get_width()*1/2, championIcon.get_height()*1/2))
-                window.blit(championIcon, championIcon.get_rect(center=(x, screen_height*9/10)))
+                championIcon = pygame.transform.smoothscale(championIcon, (championIcon.get_width()*10/16, championIcon.get_height()*10/16))
+                window.blit(championIcon, championIcon.get_rect(center=(x, screen_height*41/50)))
+
+                masteryLevel = mastery['championLevel']
+                centeredTextBox('Mastery: ' + str(masteryLevel), x, screen_height*45/50)
+
+                space -= 3
+            else:
+                x = screen_width * (space / 28)
+                championId = mastery['championId']
+                championName = championIdToName[str(championId)]
+                championIcon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\champion" + "\\" + championName + ".png"))
+                championIcon = pygame.transform.smoothscale(championIcon, (championIcon.get_width()*26/50, championIcon.get_height()*26/50))
+                window.blit(championIcon, championIcon.get_rect(center=(x, screen_height*43/50)))
+
+                masteryLevel = mastery['championLevel']
+                centeredTextBox('Mastery: ' + str(masteryLevel), x, screen_height*93/100)
+                space += 6
 
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
