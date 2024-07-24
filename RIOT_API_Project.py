@@ -41,14 +41,15 @@ white = (255,255,255)
 screen_width = 1000
 screen_height = 550
 
-regularText = pygame.font.SysFont('Ariel', 25)
-def uncenteredTextBox(x, y, msg):
-    TextSurf, TextRect = text_objects(msg, regularText)
+def uncenteredTextBox(msg, x, y, size=25, font='Ariel'):
+    Text = pygame.font.SysFont(font, size)
+    TextSurf, TextRect = text_objects(msg, Text)
     TextRect.update(x, y, 10, 10)
     window.blit(TextSurf, TextRect)
 
-def centeredTextBox(msg, x, y):
-    text = regularText.render(msg, True, white)
+def centeredTextBox(msg, x, y, size=25, font='Ariel'):
+    Text = pygame.font.SysFont(font, size)
+    text = Text.render(msg, True, white)
     window.blit(text, text.get_rect(center=(x, y)))
 
 def text_objects(text, font): #create text objects
@@ -207,9 +208,9 @@ def main_screen(riot_id_and_name):
     #winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
 
     xAlignment1 = screen_width * 1/12
-    #uncenteredTextBox(xAlignment1, screen_height*1/7, 'Average KDA: ' + average_kda)
-    #uncenteredTextBox(xAlignment1, screen_height*2/7, 'Average CS Deficit/Lead: ' + average_cs_diff)
-    #uncenteredTextBox(xAlignment1, screen_height*3/7, 'Winrate: ' + winrate + '%' )
+    #uncenteredTextBox('Average KDA: ' + average_kda, xAlignment1, screen_height*1/7)
+    #uncenteredTextBox('Average CS Deficit/Lead: ' + average_cs_diff), xAlignment1, screen_height*2/7)
+    #uncenteredTextBox('Winrate: ' + winrate + '%', xAlignment1, screen_height*3/7)
 
     asyncio.run(display_championMastery(puuid))
 
@@ -241,7 +242,7 @@ async def get_average_kda(puuid, matchHistory):
             player_index = match['metadata']['participants'].index(puuid)
             sum += match['info']['participants'][player_index]['challenges']['kda']
         
-        KDA =  str(sum / len(matchHistory))
+        KDA = str(sum / len(matchHistory))
         KDA = float(KDA[0:4])
         return str(KDA)
 
