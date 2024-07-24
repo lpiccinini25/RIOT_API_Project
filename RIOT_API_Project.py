@@ -339,7 +339,5 @@ async def display_rankedInformation(summonerId):
         window.blit(tierImage, tierImage.get_rect(center=(screen_width * 23/50, screen_height*10/50)))
         centeredTextBox(rank + ' ' + lp, xAlignment, screen_height*16/50)
 
-
-
 pygame.display.set_caption("Riot Api Project")
 enter_riot_id()
