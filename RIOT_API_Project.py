@@ -7,7 +7,7 @@ import os
 
 pygame.init()
 
-api_key = 'RGAPI-56d7d549-29a2-4391-b827-e4ed8178bfe2'
+api_key = 'RGAPI-6de5d7ee-7b67-4289-9f7d-a8e20f2ecaa9'
 
 async def updateChampionJson():
     async with aiohttp.ClientSession() as session:
@@ -203,14 +203,14 @@ def main_screen(riot_id_and_name):
     icon = pygame.image.load(os.path.abspath("C:\\Users\\Lucap\\Desktop\\RIOT_API_Project\\ProfileIcons" + "\\" + str(IconId) + ".png"))
     window.blit(icon, icon.get_rect(center=(screen_width * 6/28, screen_height * 20/50)))
 
-    #average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
-    #average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
-    #winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
+    average_kda = str(asyncio.run(get_average_kda(puuid, matchHistory)))
+    average_cs_diff = str(asyncio.run(get_average_cs_diff(puuid, matchHistory)))
+    winrate = str(asyncio.run(get_winrate(puuid, matchHistory)))
 
-    xAlignment1 = screen_width * 1/12
-    #uncenteredTextBox('Average KDA: ' + average_kda, xAlignment1, screen_height*1/7)
-    #uncenteredTextBox('Average CS Deficit/Lead: ' + average_cs_diff), xAlignment1, screen_height*2/7)
-    #uncenteredTextBox('Winrate: ' + winrate + '%', xAlignment1, screen_height*3/7)
+    xAlignment1 = screen_width * 8/12
+    uncenteredTextBox('Average KDA: ' + average_kda, xAlignment1, screen_height*1/7)
+    uncenteredTextBox('Average CS Deficit/Lead: ' + average_cs_diff, xAlignment1, screen_height*2/7)
+    uncenteredTextBox('Winrate: ' + winrate + '%', xAlignment1, screen_height*3/7)
 
     asyncio.run(display_championMastery(puuid))
     asyncio.run(display_rankedInformation(summonerId))
