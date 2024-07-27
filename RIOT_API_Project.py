@@ -6,6 +6,7 @@ import time
 import os 
 
 pygame.init()
+trust_env = True
 
 api_key = 'RGAPI-6de5d7ee-7b67-4289-9f7d-a8e20f2ecaa9'
 
