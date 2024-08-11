@@ -8,7 +8,7 @@ import os
 pygame.init()
 trust_env = True
 
-api_key = 'RGAPI-68a5d8f1-22c3-480d-bf88-490067258108'
+api_key = 'RGAPI-80cf6e35-7a0b-42b4-98bd-c6b04ebab24f'
 
 async def updateChampionJson():
     async with aiohttp.ClientSession() as session:
@@ -230,7 +230,7 @@ def main_screen(riot_id_and_name):
 def get_tasks(session, matchHistory):
         asyncMatchHistory = []
         for match in matchHistory:
-            time.sleep(0.50)
+            time.sleep(0.75)
             asyncMatchHistory.append(session.get('https://americas.api.riotgames.com/lol/match/v5/matches/' + match + '?api_key=' + api_key, ssl=False))
         return asyncMatchHistory
 
