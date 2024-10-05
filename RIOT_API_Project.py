@@ -8,7 +8,7 @@ import os
 pygame.init()
 trust_env = True
 
-api_key = 'RGAPI-5d505daa-cb36-48e5-97d6-b5767a433b9f'
+api_key = 'RGAPI-9fd5bb48-16d0-4b6b-a00e-f273fd4cbb11'
 
 async def updateChampionJson():
     async with aiohttp.ClientSession() as session:
